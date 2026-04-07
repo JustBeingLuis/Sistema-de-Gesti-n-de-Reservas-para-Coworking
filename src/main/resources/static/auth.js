@@ -2,14 +2,15 @@ const registroForm = document.getElementById("registro-form");
 const loginForm = document.getElementById("login-form");
 const registroButton = document.getElementById("submit-button");
 const loginButton = document.getElementById("login-button");
-const perfilButton = document.getElementById("perfil-button");
-const logoutButton = document.getElementById("logout-button");
 const registroMessage = document.getElementById("registro-message");
 const loginMessage = document.getElementById("login-message");
-const perfilMessage = document.getElementById("perfil-message");
-const sessionSummary = document.getElementById("session-summary");
 
 const TOKEN_KEY = "coworking_access_token";
+const DASHBOARD_URL = "/dashboard.html";
+
+if (localStorage.getItem(TOKEN_KEY)) {
+    window.location.replace(DASHBOARD_URL);
+}
 
 registroForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -92,97 +93,13 @@ loginForm.addEventListener("submit", async (event) => {
         }
 
         localStorage.setItem(TOKEN_KEY, data.accessToken);
-        loginForm.reset();
-        renderSessionSummary(data.usuario);
-        showMessage(loginMessage, `Bienvenido, ${data.usuario.nombre}. Tu sesion ya esta activa.`, "success");
-        showMessage(perfilMessage, "", "");
+        window.location.assign(DASHBOARD_URL);
     } catch (error) {
         showMessage(loginMessage, "No fue posible conectar con el backend.", "error");
     } finally {
         toggleLoading(loginButton, false);
     }
 });
-
-perfilButton.addEventListener("click", async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
-
-    if (!token) {
-        renderSessionSummary();
-        showMessage(perfilMessage, "No hay una sesion activa en este navegador.", "error");
-        return;
-    }
-
-    toggleLoading(perfilButton, true, "Actualizando...");
-
-    try {
-        const response = await fetch("/api/auth/perfil", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
-                clearSession();
-            }
-
-            showMessage(perfilMessage, data.message || "No fue posible consultar la sesion actual.", "error");
-            return;
-        }
-
-        renderSessionSummary(data);
-        showMessage(perfilMessage, "La informacion de tu cuenta fue actualizada correctamente.", "success");
-    } catch (error) {
-        showMessage(perfilMessage, "No fue posible conectar con el backend.", "error");
-    } finally {
-        toggleLoading(perfilButton, false);
-    }
-});
-
-logoutButton.addEventListener("click", () => {
-    clearSession();
-    showMessage(loginMessage, "", "");
-    showMessage(registroMessage, "", "");
-    showMessage(perfilMessage, "La sesion se cerro correctamente.", "success");
-});
-
-hydrateSessionState();
-
-function hydrateSessionState() {
-    const token = localStorage.getItem(TOKEN_KEY);
-
-    if (!token) {
-        renderSessionSummary();
-        return;
-    }
-
-    perfilButton.click();
-}
-
-function renderSessionSummary(usuario) {
-    if (!usuario) {
-        sessionSummary.innerHTML = `
-            <strong>Sin sesion activa</strong>
-            <span>Inicia sesion para acceder a tus reservas y a tu cuenta.</span>
-        `;
-        return;
-    }
-
-    sessionSummary.innerHTML = `
-        <strong>${usuario.nombre}</strong>
-        <span>Correo: ${usuario.correo}</span>
-        <span>Rol: ${usuario.rol}</span>
-        <span>Cuenta activa: ${usuario.activo ? "Si" : "No"}</span>
-    `;
-}
-
-function clearSession() {
-    localStorage.removeItem(TOKEN_KEY);
-    renderSessionSummary();
-}
 
 function showMessage(target, message, type) {
     target.textContent = message;

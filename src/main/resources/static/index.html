@@ -31,7 +31,7 @@
                 <ul>
                     <li>Registro con correo unico y contrasena segura.</li>
                     <li>Inicio de sesion con autenticacion protegida.</li>
-                    <li>Sesion persistida para consultar tu cuenta cuando la necesites.</li>
+                    <li>Ingreso directo al panel interno del coworking.</li>
                 </ul>
             </article>
         </div>
@@ -73,7 +73,7 @@
             <div class="form-header">
                 <span class="badge">Acceso</span>
                 <h2>Inicia sesion</h2>
-                <p>Entra con tu correo y contrasena para continuar con tus reservas.</p>
+                <p>Entra con tu correo y contrasena para continuar al panel de espacios.</p>
             </div>
 
             <label class="field">
@@ -89,24 +89,9 @@
             <button id="login-button" type="submit" class="primary-button">Entrar al sistema</button>
             <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
         </form>
-
-        <article class="form-card session-card">
-            <div class="form-header">
-                <span class="badge">Mi cuenta</span>
-                <h2>Estado de sesion</h2>
-                <p>Consulta rapidamente si ya estas autenticado y con que perfil ingresaste.</p>
-            </div>
-
-            <div id="session-summary" class="session-summary">
-                Aun no has iniciado sesion.
-            </div>
-            <button id="perfil-button" type="button" class="secondary-button">Actualizar mi cuenta</button>
-            <button id="logout-button" type="button" class="secondary-button secondary-button--ghost">Cerrar sesion</button>
-            <p id="perfil-message" class="form-message" role="status" aria-live="polite"></p>
-        </article>
     </section>
 </main>
 
-<script src="/app.js"></script>
+<script src="/auth.js"></script>
 </body>
 </html>

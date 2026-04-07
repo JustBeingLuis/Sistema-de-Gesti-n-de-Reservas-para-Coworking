@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Espacios | Coworking</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<section class="workspace workspace--full">
+    <div class="workspace-shell">
+        <header class="dashboard-topbar">
+            <div>
+                <p class="section-kicker">Sistema de Gestion de Reservas para Coworking</p>
+                <h1 class="dashboard-title">Panel de espacios disponibles</h1>
+                <p class="workspace-copy">
+                    Consulta el catalogo activo del coworking y revisa la capacidad y tarifa
+                    de cada espacio habilitado para reserva.
+                </p>
+            </div>
+
+            <div class="dashboard-topbar-actions">
+                <button id="logout-button" type="button" class="secondary-button secondary-button--ghost">Cerrar sesion</button>
+            </div>
+        </header>
+
+        <section class="dashboard-grid">
+            <article class="form-card session-card session-card--compact">
+                <div class="form-header">
+                    <span class="badge">Mi cuenta</span>
+                    <h2>Sesion activa</h2>
+                    <p>Resumen del usuario autenticado dentro del sistema.</p>
+                </div>
+
+                <div id="session-summary" class="session-summary">
+                    Cargando informacion de la cuenta...
+                </div>
+            </article>
+
+            <div class="dashboard-content">
+                <p id="spaces-message" class="form-message workspace-message" role="status" aria-live="polite"></p>
+
+                <div id="spaces-summary" class="summary-grid">
+                    <article class="summary-card">
+                        <span>Total de espacios</span>
+                        <strong>0</strong>
+                    </article>
+                    <article class="summary-card">
+                        <span>Capacidad acumulada</span>
+                        <strong>0</strong>
+                    </article>
+                    <article class="summary-card">
+                        <span>Tipos disponibles</span>
+                        <strong>0</strong>
+                    </article>
+                </div>
+
+                <div id="spaces-grid" class="spaces-grid">
+                    <article class="empty-state">
+                        <h3>Cargando catalogo de espacios</h3>
+                        <p>Espera un momento mientras consultamos la informacion del coworking.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+
+<script src="/dashboard.js"></script>
+</body>
+</html>
