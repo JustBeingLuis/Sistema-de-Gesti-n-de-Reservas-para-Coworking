@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro | Coworking</title>
+    <title>Registro y Autenticacion | Coworking</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <main class="layout">
     <section class="hero">
-        <p class="eyebrow">RF01 · Registro de usuarios</p>
-        <h1>Abre tu cuenta y entra al coworking sin friccion.</h1>
+        <p class="eyebrow">RF01 + RF02 · Registro y autenticacion</p>
+        <h1>Abre tu cuenta, inicia sesion y valida tu acceso.</h1>
         <p class="lead">
-            Esta pantalla implementa el primer requerimiento funcional del sprint:
-            registro con nombre, correo unico y contrasena minima de 8 caracteres.
+            Esta pantalla implementa los dos primeros requerimientos funcionales del sprint:
+            autoregistro y autenticacion con correo, contrasena y token JWT.
         </p>
 
         <div class="info-grid">
             <article class="info-card">
-                <h2>Validaciones</h2>
+                <h2>RF01</h2>
                 <ul>
                     <li>Nombre obligatorio.</li>
                     <li>Correo en formato valido y sin duplicados.</li>
@@ -27,22 +27,22 @@
             </article>
 
             <article class="info-card">
-                <h2>Comportamiento</h2>
+                <h2>RF02</h2>
                 <ul>
-                    <li>El backend asigna el rol USER por defecto.</li>
-                    <li>La contrasena se cifra antes de guardarse.</li>
-                    <li>Se registra la fecha de alta del usuario.</li>
+                    <li>Login con correo y contrasena.</li>
+                    <li>Generacion de token JWT firmado.</li>
+                    <li>Acceso restringido a rutas protegidas.</li>
                 </ul>
             </article>
         </div>
     </section>
 
-    <section class="panel">
+    <section class="panel stack">
         <form id="registro-form" class="form-card" novalidate>
             <div class="form-header">
-                <span class="badge">Nuevo usuario</span>
+                <span class="badge">RF01</span>
                 <h2>Autoregistro</h2>
-                <p>Completa tus datos para crear la cuenta en el sistema.</p>
+                <p>Crea un usuario nuevo para luego autenticarte en la plataforma.</p>
             </div>
 
             <label class="field">
@@ -52,12 +52,12 @@
 
             <label class="field">
                 <span>Correo electronico</span>
-                <input id="correo" name="correo" type="email" maxlength="150" placeholder="usuario@correo.com" required>
+                <input id="correoRegistro" name="correoRegistro" type="email" maxlength="150" placeholder="usuario@correo.com" required>
             </label>
 
             <label class="field">
                 <span>Contrasena</span>
-                <input id="password" name="password" type="password" minlength="8" placeholder="Minimo 8 caracteres" required>
+                <input id="passwordRegistro" name="passwordRegistro" type="password" minlength="8" placeholder="Minimo 8 caracteres" required>
             </label>
 
             <label class="field">
@@ -66,8 +66,41 @@
             </label>
 
             <button id="submit-button" type="submit" class="primary-button">Registrar usuario</button>
-            <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+            <p id="registro-message" class="form-message" role="status" aria-live="polite"></p>
         </form>
+
+        <form id="login-form" class="form-card" novalidate>
+            <div class="form-header">
+                <span class="badge">RF02</span>
+                <h2>Autenticacion</h2>
+                <p>Inicia sesion con correo y contrasena para obtener un token JWT.</p>
+            </div>
+
+            <label class="field">
+                <span>Correo electronico</span>
+                <input id="correoLogin" name="correoLogin" type="email" maxlength="150" placeholder="usuario@correo.com" required>
+            </label>
+
+            <label class="field">
+                <span>Contrasena</span>
+                <input id="passwordLogin" name="passwordLogin" type="password" placeholder="Tu contrasena" required>
+            </label>
+
+            <button id="login-button" type="submit" class="primary-button">Iniciar sesion</button>
+            <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <article class="form-card token-card">
+            <div class="form-header">
+                <span class="badge">Token</span>
+                <h2>Sesion actual</h2>
+                <p>Usa el token emitido para consultar un recurso protegido del backend.</p>
+            </div>
+
+            <pre id="token-preview" class="token-preview">Aun no hay token almacenado.</pre>
+            <button id="perfil-button" type="button" class="secondary-button">Consultar perfil protegido</button>
+            <p id="perfil-message" class="form-message" role="status" aria-live="polite"></p>
+        </article>
     </section>
 </main>
 

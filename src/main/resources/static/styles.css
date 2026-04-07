@@ -100,9 +100,19 @@ body {
     justify-content: center;
 }
 
+.stack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+}
+
 .form-card {
     width: min(100%, 460px);
     padding: 28px;
+}
+
+.token-card {
+    width: min(100%, 460px);
 }
 
 .form-header {
@@ -179,9 +189,47 @@ body {
     transform: translateY(-2px);
 }
 
+.secondary-button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px 18px;
+    border: 1px solid rgba(19, 34, 56, 0.14);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.secondary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 28px rgba(19, 34, 56, 0.1);
+}
+
 .primary-button:disabled {
     cursor: wait;
     opacity: 0.8;
+}
+
+.secondary-button:disabled {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+.token-preview {
+    margin: 0;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(19, 34, 56, 0.92);
+    color: #f6efe5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.88rem;
+    line-height: 1.55;
 }
 
 .form-message {
