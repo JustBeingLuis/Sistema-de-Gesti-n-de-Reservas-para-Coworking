@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | Coworking</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="layout">
+    <section class="hero">
+        <p class="eyebrow">RF01 · Registro de usuarios</p>
+        <h1>Abre tu cuenta y entra al coworking sin friccion.</h1>
+        <p class="lead">
+            Esta pantalla implementa el primer requerimiento funcional del sprint:
+            registro con nombre, correo unico y contrasena minima de 8 caracteres.
+        </p>
+
+        <div class="info-grid">
+            <article class="info-card">
+                <h2>Validaciones</h2>
+                <ul>
+                    <li>Nombre obligatorio.</li>
+                    <li>Correo en formato valido y sin duplicados.</li>
+                    <li>Contrasena de minimo 8 caracteres.</li>
+                </ul>
+            </article>
+
+            <article class="info-card">
+                <h2>Comportamiento</h2>
+                <ul>
+                    <li>El backend asigna el rol USER por defecto.</li>
+                    <li>La contrasena se cifra antes de guardarse.</li>
+                    <li>Se registra la fecha de alta del usuario.</li>
+                </ul>
+            </article>
+        </div>
+    </section>
+
+    <section class="panel">
+        <form id="registro-form" class="form-card" novalidate>
+            <div class="form-header">
+                <span class="badge">Nuevo usuario</span>
+                <h2>Autoregistro</h2>
+                <p>Completa tus datos para crear la cuenta en el sistema.</p>
+            </div>
+
+            <label class="field">
+                <span>Nombre completo</span>
+                <input id="nombre" name="nombre" type="text" maxlength="100" placeholder="Ej. Laura Rodriguez" required>
+            </label>
+
+            <label class="field">
+                <span>Correo electronico</span>
+                <input id="correo" name="correo" type="email" maxlength="150" placeholder="usuario@correo.com" required>
+            </label>
+
+            <label class="field">
+                <span>Contrasena</span>
+                <input id="password" name="password" type="password" minlength="8" placeholder="Minimo 8 caracteres" required>
+            </label>
+
+            <label class="field">
+                <span>Confirmar contrasena</span>
+                <input id="confirmacionPassword" name="confirmacionPassword" type="password" minlength="8" placeholder="Repite la contrasena" required>
+            </label>
+
+            <button id="submit-button" type="submit" class="primary-button">Registrar usuario</button>
+            <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+        </form>
+    </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>
