@@ -458,6 +458,7 @@ body.modal-open {
     padding: 18px 20px;
     display: grid;
     gap: 8px;
+    min-width: 0;
 }
 
 .summary-card span {
@@ -468,6 +469,16 @@ body.modal-open {
 .summary-card strong {
     font-size: clamp(1.6rem, 3vw, 2.2rem);
     font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+#admin-reportes-summary .report-state-value {
+    font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+    line-height: 1.15;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .spaces-grid {

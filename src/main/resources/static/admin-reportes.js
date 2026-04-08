@@ -281,7 +281,7 @@ function renderReportSummary(resumen) {
         </article>
         <article class="summary-card">
             <span>Estado consultado</span>
-            <strong>${escapeHtml(formatStatus(resumen.estado || ""))}</strong>
+            <strong class="report-state-value">${escapeHtml(formatStatus(resumen.estado || ""))}</strong>
         </article>
     `;
 
