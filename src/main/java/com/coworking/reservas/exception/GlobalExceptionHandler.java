@@ -14,6 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -56,6 +57,12 @@ public class GlobalExceptionHandler {
                                                        HttpServletRequest request) {
         String message = "El parametro '" + ex.getName() + "' tiene un formato invalido.";
         return buildError(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResourceFound(NoResourceFoundException ex,
+                                                          HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, "El recurso solicitado no existe.", request.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)
