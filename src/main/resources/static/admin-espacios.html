@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Espacios | Coworking</title>
+    <link rel="stylesheet" href="/styles.css?v=20260408a">
+</head>
+<body>
+<section class="workspace workspace--full">
+    <div class="workspace-shell">
+        <header class="dashboard-topbar">
+            <div>
+                <p class="section-kicker">Sistema de Gestion de Reservas para Coworking</p>
+                <h1 class="dashboard-title">Gestion de espacios</h1>
+                <p class="workspace-copy">
+                    Administra el catalogo del coworking, crea nuevos espacios, actualiza su configuracion
+                    y desactiva los que ya no deben estar disponibles para reserva.
+                </p>
+            </div>
+        </header>
+
+        <section class="dashboard-grid dashboard-grid--admin">
+            <div class="admin-sidebar">
+                <article class="form-card session-card session-card--compact">
+                    <div class="form-header">
+                        <span class="badge">Administrador</span>
+                        <h2>Sesion activa</h2>
+                        <p>Acceso restringido a la gestion del catalogo de espacios.</p>
+                    </div>
+
+                    <div id="admin-session-summary" class="session-summary">
+                        Cargando informacion de la cuenta...
+                    </div>
+                    <a href="/dashboard.html" class="secondary-button secondary-link-button">Volver al panel</a>
+                    <button id="admin-logout-button" type="button" class="secondary-button secondary-button--ghost">
+                        Cerrar sesion
+                    </button>
+                </article>
+
+                <article class="form-card">
+                    <div class="form-header">
+                        <span class="badge">RF07</span>
+                        <h2 id="admin-form-title">Nuevo espacio</h2>
+                        <p>Completa los datos del espacio. Si editas uno existente, los cambios se guardaran sobre ese registro.</p>
+                    </div>
+
+                    <form id="admin-space-form">
+                        <label class="field">
+                            <span>Nombre del espacio</span>
+                            <input id="admin-space-name" type="text" maxlength="100" required>
+                        </label>
+
+                        <label class="field">
+                            <span>Tipo de espacio</span>
+                            <select id="admin-space-type" class="field-select" required>
+                                <option value="">Selecciona un tipo</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            <span>Capacidad</span>
+                            <input id="admin-space-capacity" type="number" min="1" step="1" required>
+                        </label>
+
+                        <label class="field">
+                            <span>Precio por hora</span>
+                            <input id="admin-space-price" type="number" min="0.01" step="0.01" required>
+                        </label>
+
+                        <label class="checkbox-field">
+                            <input id="admin-space-active" type="checkbox" checked>
+                            <span>Espacio activo para reservas</span>
+                        </label>
+
+                        <div class="admin-form-actions">
+                            <button id="admin-space-submit" type="submit" class="primary-button">Guardar espacio</button>
+                            <button id="admin-space-reset" type="button" class="secondary-button">Limpiar formulario</button>
+                        </div>
+                    </form>
+
+                    <p id="admin-space-form-message" class="form-message" role="status" aria-live="polite"></p>
+                </article>
+            </div>
+
+            <div class="dashboard-content">
+                <p id="admin-spaces-message" class="form-message workspace-message" role="status" aria-live="polite"></p>
+
+                <div id="admin-spaces-grid" class="spaces-grid">
+                    <article class="empty-state">
+                        <h3>Cargando espacios del coworking</h3>
+                        <p>Espera un momento mientras consultamos el catalogo completo para administracion.</p>
+                    </article>
+                </div>
+
+                <div id="admin-spaces-pagination" class="pagination-bar" aria-live="polite"></div>
+            </div>
+        </section>
+    </div>
+</section>
+
+<script src="/admin-espacios.js?v=20260408a"></script>
+</body>
+</html>

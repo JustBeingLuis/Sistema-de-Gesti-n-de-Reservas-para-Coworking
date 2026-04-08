@@ -1,6 +1,8 @@
 const logoutButton = document.getElementById("logout-button");
 const spacesMessage = document.getElementById("spaces-message");
 const sessionSummary = document.getElementById("session-summary");
+const myReservationsLink = document.getElementById("my-reservations-link");
+const adminSpacesLink = document.getElementById("admin-spaces-link");
 const spacesSummary = document.getElementById("spaces-summary");
 const spacesGrid = document.getElementById("spaces-grid");
 const spacesPagination = document.getElementById("spaces-pagination");
@@ -315,6 +317,10 @@ async function loadAvailabilityDetails(showFeedback = true) {
 }
 
 function renderSessionSummary(usuario) {
+    const esAdmin = String(usuario.rol || "").toUpperCase() === "ADMIN";
+    myReservationsLink.hidden = esAdmin;
+    adminSpacesLink.hidden = !esAdmin;
+
     sessionSummary.innerHTML = `
         <strong>${escapeHtml(usuario.nombre || "")}</strong>
         <span>Correo: ${escapeHtml(usuario.correo || "")}</span>

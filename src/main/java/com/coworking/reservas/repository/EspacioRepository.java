@@ -12,6 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 public interface EspacioRepository extends JpaRepository<Espacio, Long> {
 
     @EntityGraph(attributePaths = "tipo")
+    Page<Espacio> findAllBy(Pageable pageable);
+
+    @EntityGraph(attributePaths = "tipo")
     Page<Espacio> findByActivoTrue(Pageable pageable);
 
     @Query("""

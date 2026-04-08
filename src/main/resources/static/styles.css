@@ -14,6 +14,10 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
@@ -174,11 +178,44 @@ body.modal-open {
     transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.field-select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(19, 34, 56, 0.14);
+    background: rgba(255, 255, 255, 0.78);
+    font: inherit;
+    color: var(--ink);
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
 .field input:focus {
     outline: none;
     border-color: rgba(212, 106, 58, 0.8);
     box-shadow: 0 0 0 4px rgba(212, 106, 58, 0.14);
     transform: translateY(-1px);
+}
+
+.field-select:focus {
+    outline: none;
+    border-color: rgba(212, 106, 58, 0.8);
+    box-shadow: 0 0 0 4px rgba(212, 106, 58, 0.14);
+    transform: translateY(-1px);
+}
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 18px;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.checkbox-field input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
 }
 
 .primary-button {
@@ -349,6 +386,16 @@ body.modal-open {
     align-items: start;
 }
 
+.dashboard-grid--admin {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+}
+
+.admin-sidebar {
+    display: grid;
+    gap: 24px;
+    align-items: start;
+}
+
 .dashboard-content {
     min-width: 0;
 }
@@ -445,6 +492,7 @@ body.modal-open {
 .space-card-header h3 {
     margin: 0;
     font-size: 1.2rem;
+    overflow-wrap: anywhere;
 }
 
 .space-badge {
@@ -492,6 +540,53 @@ body.modal-open {
 .space-card-actions {
     display: flex;
     justify-content: flex-end;
+}
+
+.admin-space-card {
+    gap: 16px;
+    grid-template-rows: auto auto auto 1fr auto;
+    min-height: 100%;
+}
+
+.admin-space-badges {
+    display: grid;
+    gap: 8px;
+    justify-items: end;
+    align-content: start;
+    min-width: 0;
+}
+
+.admin-space-actions,
+.admin-form-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.admin-space-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    margin-top: auto;
+}
+
+.admin-card-button,
+.admin-form-actions .primary-button,
+.admin-form-actions .secondary-button {
+    width: auto;
+    margin-top: 0;
+}
+
+.admin-card-button {
+    width: 100%;
+    min-width: 0;
+}
+
+.admin-space-badges .space-badge {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    justify-content: center;
 }
 
 .space-details-button {
@@ -562,8 +657,14 @@ body.modal-open {
     color: var(--success);
 }
 
+.status-badge--active {
+    background: rgba(31, 122, 82, 0.14);
+    color: var(--success);
+}
+
 .status-badge--cancelled,
-.status-badge--finished {
+.status-badge--finished,
+.status-badge--inactive {
     background: rgba(156, 47, 47, 0.14);
     color: var(--danger);
 }
@@ -844,6 +945,8 @@ body.modal-open {
     }
 
     .space-card-actions,
+    .admin-space-actions,
+    .admin-form-actions,
     .modal-header-top,
     .slot-card,
     .availability-actions,
