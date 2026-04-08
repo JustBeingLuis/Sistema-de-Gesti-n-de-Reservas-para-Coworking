@@ -3,6 +3,7 @@ const spacesMessage = document.getElementById("spaces-message");
 const sessionSummary = document.getElementById("session-summary");
 const myReservationsLink = document.getElementById("my-reservations-link");
 const adminSpacesLink = document.getElementById("admin-spaces-link");
+const adminReservationsLink = document.getElementById("admin-reservations-link");
 const spacesSummary = document.getElementById("spaces-summary");
 const spacesGrid = document.getElementById("spaces-grid");
 const spacesPagination = document.getElementById("spaces-pagination");
@@ -320,6 +321,7 @@ function renderSessionSummary(usuario) {
     const esAdmin = String(usuario.rol || "").toUpperCase() === "ADMIN";
     myReservationsLink.hidden = esAdmin;
     adminSpacesLink.hidden = !esAdmin;
+    adminReservationsLink.hidden = !esAdmin;
 
     sessionSummary.innerHTML = `
         <strong>${escapeHtml(usuario.nombre || "")}</strong>

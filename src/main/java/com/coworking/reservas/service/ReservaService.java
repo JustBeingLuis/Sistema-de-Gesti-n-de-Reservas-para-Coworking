@@ -7,11 +7,14 @@ import com.coworking.reservas.domain.Espacio;
 import com.coworking.reservas.domain.EstadoReserva;
 import com.coworking.reservas.domain.Reserva;
 import com.coworking.reservas.domain.Usuario;
+import com.coworking.reservas.dto.PageResponse;
+import com.coworking.reservas.dto.ReservaAdminListadoResponse;
+import com.coworking.reservas.dto.ReservaAdminResponse;
+import com.coworking.reservas.dto.ReservaAdminSummaryResponse;
 import com.coworking.reservas.dto.ReservaCreateRequest;
 import com.coworking.reservas.dto.ReservaListadoResponse;
 import com.coworking.reservas.dto.ReservaListadoSummaryResponse;
 import com.coworking.reservas.dto.ReservaResponse;
-import com.coworking.reservas.dto.PageResponse;
 import com.coworking.reservas.exception.ResourceNotFoundException;
 import com.coworking.reservas.repository.EspacioRepository;
 import com.coworking.reservas.repository.EstadoReservaRepository;
@@ -22,7 +25,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -98,8 +103,33 @@ public class ReservaService implements IReservaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Scheduled(fixedDelayString = "${app.reservas.finalization-interval-ms:60000}")
+    public void actualizarReservasFinalizadas() {
+        EstadoReserva estadoFinalizada = estadoReservaRepository.findByNombreIgnoreCase(ESTADO_FINALIZADA)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontro el estado de reserva '" + ESTADO_FINALIZADA + "'."
+                ));
+
+        EstadoReserva estadoCancelada = estadoReservaRepository.findByNombreIgnoreCase(ESTADO_CANCELADA)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontro el estado de reserva '" + ESTADO_CANCELADA + "'."
+                ));
+
+        LocalDateTime ahora = LocalDateTime.now(getBusinessZoneId());
+
+        reservaRepository.marcarReservasComoFinalizadas(
+                estadoFinalizada,
+                estadoCancelada.getId(),
+                estadoFinalizada.getId(),
+                ahora.toLocalDate(),
+                ahora.toLocalTime()
+        );
+    }
+
+    @Override
     public ReservaListadoResponse consultarReservasDelUsuario(Long usuarioId, int page, int size) {
+        actualizarReservasFinalizadas();
         validarPaginacion(page, size);
 
         PageRequest pageable = PageRequest.of(
@@ -131,7 +161,36 @@ public class ReservaService implements IReservaService {
     }
 
     @Override
+    public ReservaAdminListadoResponse consultarTodasLasReservas(int page, int size) {
+        actualizarReservasFinalizadas();
+        validarPaginacion(page, size);
+
+        PageRequest pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Order.desc("fecha"),
+                        Sort.Order.desc("horaInicio"),
+                        Sort.Order.desc("fechaCreacion")
+                )
+        );
+
+        Page<ReservaAdminResponse> reservas = reservaRepository.findAllBy(pageable)
+                .map(this::mapToAdminResponse);
+
+        ReservaAdminSummaryResponse resumen = new ReservaAdminSummaryResponse(
+                reservas.getTotalElements(),
+                reservaRepository.countReservasActivas(),
+                reservaRepository.countReservasCanceladas()
+        );
+
+        return new ReservaAdminListadoResponse(PageResponse.from(reservas), resumen);
+    }
+
+    @Override
     public ReservaResponse cancelarReserva(Long usuarioId, Long reservaId) {
+        actualizarReservasFinalizadas();
+
         Reserva reserva = reservaRepository.findDetalleById(reservaId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontro la reserva solicitada."
@@ -188,6 +247,23 @@ public class ReservaService implements IReservaService {
                 reserva.getEstado().getNombre(),
                 validacion.puedeCancelarse(),
                 validacion.motivoNoCancelable()
+        );
+    }
+
+    private ReservaAdminResponse mapToAdminResponse(Reserva reserva) {
+        return new ReservaAdminResponse(
+                reserva.getId(),
+                reserva.getUsuario().getId(),
+                reserva.getUsuario().getNombre(),
+                reserva.getUsuario().getCorreo(),
+                reserva.getEspacio().getId(),
+                reserva.getEspacio().getNombre(),
+                reserva.getEspacio().getTipo().getNombre(),
+                reserva.getFecha(),
+                reserva.getHoraInicio(),
+                reserva.getHoraFin(),
+                reserva.getFechaCreacion(),
+                reserva.getEstado().getNombre()
         );
     }
 

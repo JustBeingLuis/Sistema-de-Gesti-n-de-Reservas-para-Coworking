@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todas las Reservas | Coworking</title>
+    <link rel="stylesheet" href="/styles.css?v=20260408b">
+</head>
+<body>
+<section class="workspace workspace--full">
+    <div class="workspace-shell">
+        <header class="dashboard-topbar">
+            <div>
+                <p class="section-kicker">Sistema de Gestion de Reservas para Coworking</p>
+                <h1 class="dashboard-title">Todas las reservas</h1>
+                <p class="workspace-copy">
+                    Visualiza todas las reservas registradas en el sistema con su usuario, espacio,
+                    fecha, horario y estado actual.
+                </p>
+            </div>
+        </header>
+
+        <section class="dashboard-grid dashboard-grid--admin">
+            <div class="admin-sidebar">
+                <article class="form-card session-card session-card--compact">
+                    <div class="form-header">
+                        <span class="badge">Administrador</span>
+                        <h2>Sesion activa</h2>
+                        <p>Acceso restringido a la visualizacion global de reservas.</p>
+                    </div>
+
+                    <div id="admin-reservas-session-summary" class="session-summary">
+                        Cargando informacion de la cuenta...
+                    </div>
+                    <a href="/admin-espacios.html" class="secondary-button secondary-link-button">Gestionar espacios</a>
+                    <a href="/dashboard.html" class="secondary-button secondary-link-button">Volver al panel</a>
+                    <button id="admin-reservas-logout-button" type="button" class="secondary-button secondary-button--ghost">
+                        Cerrar sesion
+                    </button>
+                </article>
+            </div>
+
+            <div class="dashboard-content">
+                <p id="admin-reservas-message" class="form-message workspace-message" role="status" aria-live="polite"></p>
+
+                <div id="admin-reservas-summary" class="summary-grid">
+                    <article class="summary-card">
+                        <span>Total de reservas</span>
+                        <strong>0</strong>
+                    </article>
+                    <article class="summary-card">
+                        <span>Reservas activas</span>
+                        <strong>0</strong>
+                    </article>
+                    <article class="summary-card">
+                        <span>Reservas canceladas</span>
+                        <strong>0</strong>
+                    </article>
+                </div>
+
+                <div id="admin-reservas-grid" class="reservations-grid">
+                    <article class="empty-state">
+                        <h3>Cargando reservas</h3>
+                        <p>Espera un momento mientras consultamos todas las reservas del sistema.</p>
+                    </article>
+                </div>
+
+                <div id="admin-reservas-pagination" class="pagination-bar" aria-live="polite"></div>
+            </div>
+        </section>
+    </div>
+</section>
+
+<script src="/admin-reservas.js?v=20260408b"></script>
+</body>
+</html>

@@ -636,10 +636,23 @@ body.modal-open {
     gap: 12px;
 }
 
+.reservation-meta--admin {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .reservation-note {
     margin: 0;
     color: var(--ink-soft);
     line-height: 1.6;
+}
+
+.reservation-note strong {
+    color: var(--ink);
+    margin-right: 8px;
+}
+
+.reservation-note-inline {
+    word-break: break-word;
 }
 
 .reservation-actions {

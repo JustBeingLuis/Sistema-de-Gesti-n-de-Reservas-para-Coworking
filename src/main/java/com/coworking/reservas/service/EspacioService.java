@@ -41,6 +41,9 @@ public class EspacioService implements IEspacioService {
     private ReservaRepository reservaRepository;
 
     @Autowired
+    private IReservaService reservaService;
+
+    @Autowired
     private TipoEspacioRepository tipoEspacioRepository;
 
     @Override
@@ -152,6 +155,7 @@ public class EspacioService implements IEspacioService {
     public EspacioDisponibilidadDetalleResponse consultarDisponibilidadPorFechaYHorario(Long espacioId, LocalDate fecha,
                                                                                         LocalTime horaInicio,
                                                                                         LocalTime horaFin) {
+        reservaService.actualizarReservasFinalizadas();
         validarConsultaDisponibilidad(fecha, horaInicio, horaFin);
 
         Espacio espacio = espacioRepository.findByIdAndActivoTrue(espacioId)
