@@ -196,6 +196,28 @@ public class ReservaService implements IReservaService {
     }
 
     @Override
+    public ReservaAdminResponse cancelarReservaComoAdministrador(Long reservaId) {
+        actualizarReservasFinalizadas();
+
+        Reserva reserva = reservaRepository.findDetalleById(reservaId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontro la reserva solicitada."
+                ));
+
+        if (!ESTADO_CONFIRMADA.equalsIgnoreCase(reserva.getEstado().getNombre())) {
+            throw new IllegalArgumentException("Solo se pueden cancelar reservas en estado CONFIRMADA.");
+        }
+
+        EstadoReserva estadoCancelada = estadoReservaRepository.findByNombreIgnoreCase(ESTADO_CANCELADA)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontro el estado de reserva '" + ESTADO_CANCELADA + "'."
+                ));
+
+        reserva.setEstado(estadoCancelada);
+        return mapToAdminResponse(reservaRepository.save(reserva));
+    }
+
+    @Override
     public ReporteOcupacionListadoResponse generarReporteOcupacion(LocalDate fechaInicio, LocalDate fechaFin,
                                                                    String estado, String modo, Long espacioId,
                                                                    int page, int size) {

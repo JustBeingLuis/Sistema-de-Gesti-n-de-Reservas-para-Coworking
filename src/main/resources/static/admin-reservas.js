@@ -17,6 +17,20 @@ adminReservasLogoutButton.addEventListener("click", () => {
     window.location.assign(LOGIN_URL);
 });
 
+adminReservasGrid.addEventListener("click", async (event) => {
+    const cancelButton = event.target.closest("[data-cancel-reservation-id]");
+
+    if (!cancelButton || cancelButton.disabled) {
+        return;
+    }
+
+    const reservationId = Number(cancelButton.dataset.cancelReservationId);
+
+    if (Number.isInteger(reservationId)) {
+        await cancelReservationAsAdmin(reservationId, cancelButton);
+    }
+});
+
 adminReservasPagination.addEventListener("click", async (event) => {
     const button = event.target.closest("[data-page-target]");
 
@@ -207,9 +221,63 @@ function renderReservasGrid(reservas) {
                         <strong>#${reserva.id}</strong>
                     </div>
                 </div>
+
+                ${estado === "CONFIRMADA" ? `
+                    <div class="reservation-actions">
+                        <button
+                            type="button"
+                            class="secondary-button reservation-cancel-button"
+                            data-cancel-reservation-id="${reserva.id}"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                ` : ""}
             </article>
         `;
     }).join("");
+}
+
+async function cancelReservationAsAdmin(reservationId, button) {
+    if (!window.confirm("Esta reserva se cancelara inmediatamente. Deseas continuar?")) {
+        return;
+    }
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    toggleLoading(button, true, "Cancelando...");
+
+    try {
+        const response = await fetch(`/api/admin/reservas/${reservationId}/cancelar`, {
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                clearSession();
+                window.location.replace(response.status === 403 ? DASHBOARD_URL : LOGIN_URL);
+                return;
+            }
+
+            showMessage(adminReservasMessage, data.message || "No fue posible cancelar la reserva.", "error");
+            return;
+        }
+
+        await loadAdminReservas(currentAdminReservasPage, false);
+        showMessage(
+            adminReservasMessage,
+            `La reserva #${data.id} fue cancelada correctamente.`,
+            "success"
+        );
+    } catch (error) {
+        showMessage(adminReservasMessage, "No fue posible conectar con el backend.", "error");
+    } finally {
+        toggleLoading(button, false);
+    }
 }
 
 function renderPagination(target, pageData, itemLabel) {
@@ -318,6 +386,15 @@ function formatTime(value) {
 function showMessage(target, message, type) {
     target.textContent = message;
     target.className = type ? `form-message ${type}` : "form-message";
+}
+
+function toggleLoading(button, isLoading, loadingText) {
+    if (!button.dataset.defaultText) {
+        button.dataset.defaultText = button.textContent.trim();
+    }
+
+    button.disabled = isLoading;
+    button.textContent = isLoading ? loadingText : button.dataset.defaultText;
 }
 
 function escapeHtml(value) {
