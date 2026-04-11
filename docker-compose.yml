@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: coworking_backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    networks:
+      - coworking_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: coworking_frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      - coworking_network
+    depends_on:
+      - backend
+
+networks:
+  coworking_network:
+    driver: bridge
