@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestion de Reservas | Coworking</title>
-    <link rel="stylesheet" href="/styles.css?v=20260408c">
+    <title>CoworkingHub | Sistema de Gestion de Reservas</title>
+    <link rel="stylesheet" href="/styles.css?v=20260413h">
 </head>
 <body>
 <main class="layout">
-    <section class="hero">
-        <p class="eyebrow">Sistema de Gestion de Reservas para Coworking</p>
-        <h1>Reserva escritorios, salas y oficinas desde una sola cuenta.</h1>
-        <p class="lead">
-            Crea tu perfil o inicia sesion para entrar a la plataforma y comenzar a gestionar
-            tus espacios de trabajo compartido con acceso seguro.
-        </p>
+    <section class="hero" style="display: flex; flex-direction: column; justify-content: center; padding: 40px 0;">
+        <div>
+            <p class="eyebrow" style="margin-bottom: 8px;">Bienvenido a</p>
+            <h1 style="font-size: clamp(3.2rem, 6vw, 5.5rem);">CoworkingHub</h1>
+            <p class="lead" style="margin-top: 24px; font-size: 1.15rem; max-width: 52ch;">
+                Reserva escritorios, salas y oficinas desde una sola cuenta.
+                Crea tu perfil o inicia sesion para entrar a la plataforma y comenzar a gestionar
+                tus espacios de trabajo compartido con acceso seguro.
+            </p>
+        </div>
 
-        <div class="info-grid">
+        <div class="info-grid" style="margin-top: 64px;">
             <article class="info-card">
                 <h2>Espacios listos para tu jornada</h2>
                 <ul>
@@ -66,10 +69,11 @@
             </label>
 
             <button id="submit-button" type="submit" class="primary-button">Crear mi cuenta</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.94rem; color: var(--ink-soft);">¿Ya tienes cuenta? <button type="button" id="show-login" style="background: none; border: none; font-weight: bold; color: var(--accent); cursor: pointer; padding: 0; font: inherit;">Inicia sesión</button></p>
             <p id="registro-message" class="form-message" role="status" aria-live="polite"></p>
         </form>
 
-        <form id="login-form" class="form-card" novalidate>
+        <form id="login-form" class="form-card" novalidate hidden>
             <div class="form-header">
                 <span class="badge">Acceso</span>
                 <h2>Inicia sesion</h2>
@@ -87,11 +91,12 @@
             </label>
 
             <button id="login-button" type="submit" class="primary-button">Entrar al sistema</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 0.94rem; color: var(--ink-soft);">¿No tienes cuenta? <button type="button" id="show-register" style="background: none; border: none; font-weight: bold; color: var(--accent); cursor: pointer; padding: 0; font: inherit;">Regístrate</button></p>
             <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
         </form>
     </section>
 </main>
 
-<script src="/auth.js?v=20260408c"></script>
+<script src="/auth.js?v=20260413h"></script>
 </body>
 </html>

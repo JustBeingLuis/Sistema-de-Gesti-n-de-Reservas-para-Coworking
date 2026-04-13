@@ -8,6 +8,19 @@ const loginMessage = document.getElementById("login-message");
 const TOKEN_KEY = "coworking_access_token";
 const DASHBOARD_URL = "/dashboard.html";
 
+const showLoginBtn = document.getElementById("show-login");
+const showRegisterBtn = document.getElementById("show-register");
+
+showLoginBtn?.addEventListener("click", () => {
+    registroForm.hidden = true;
+    loginForm.hidden = false;
+});
+
+showRegisterBtn?.addEventListener("click", () => {
+    loginForm.hidden = true;
+    registroForm.hidden = false;
+});
+
 if (localStorage.getItem(TOKEN_KEY)) {
     window.location.replace(DASHBOARD_URL);
 }
