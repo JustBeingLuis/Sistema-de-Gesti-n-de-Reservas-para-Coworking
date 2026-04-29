@@ -20,6 +20,9 @@ const AdminUsuarios = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [roles, setRoles] = useState([]); // Array of { id, nombre }
   const [saving, setSaving] = useState(false);
+  const [toggleTarget, setToggleTarget] = useState(null);
+  const [toggling, setToggling] = useState(false);
+  const [toggleError, setToggleError] = useState('');
 
   const loadUsers = async (page = 0) => {
     try {
@@ -85,17 +88,32 @@ const AdminUsuarios = () => {
     }
   };
 
-  const handleToggleEstado = async (userId, currentState) => {
-    if (!window.confirm(currentState ? t('admin.users.confirmDesact') : t('admin.users.activate'))) return;
+  const handleToggleEstado = (user) => {
+    setToggleTarget(user);
+    setToggleError('');
+  };
+
+  const closeToggleModal = () => {
+    if (toggling) return;
+    setToggleTarget(null);
+    setToggleError('');
+  };
+
+  const handleToggleConfirm = async () => {
+    if (!toggleTarget) return;
     try {
+      setToggling(true);
       // Backend expects @RequestParam Boolean activo (query parameter, NOT body)
-      const newState = !currentState;
-      await fetchApi(`/api/admin/usuarios/${userId}/estado?activo=${newState}`, {
+      const newState = !toggleTarget.activo;
+      await fetchApi(`/api/admin/usuarios/${toggleTarget.id}/estado?activo=${newState}`, {
         method: 'PATCH'
       });
+      setToggleTarget(null);
       loadUsers(data.pageNumber);
     } catch (err) {
-      alert(err.message || 'Error changing status');
+      setToggleError(err.message || 'Error changing status');
+    } finally {
+      setToggling(false);
     }
   };
 
@@ -152,7 +170,7 @@ const AdminUsuarios = () => {
                        <Button 
                         variant={user.activo ? "ghost" : "primary"} 
                         className={cn("h-8 text-xs", user.activo && "text-red-600 hover:text-red-700 dark:text-red-400")}
-                        onClick={() => handleToggleEstado(user.id, user.activo)}
+                        onClick={() => handleToggleEstado(user)}
                        >
                         {user.activo ? t('admin.users.deactivate') : t('admin.users.activate')}
                        </Button>
@@ -215,6 +233,45 @@ const AdminUsuarios = () => {
             </div>
           </form>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={!!toggleTarget}
+        onClose={closeToggleModal}
+        title={toggleTarget?.activo ? t('admin.users.deactivate') : t('admin.users.activate')}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 dark:text-zinc-400">
+            {toggleTarget?.activo ? t('admin.users.confirmDesact') : t('admin.users.confirmAct')}
+          </p>
+          {toggleTarget && (
+            <div className="rounded-lg border border-slate-200 p-3 text-sm text-slate-700 dark:border-zinc-800 dark:text-zinc-300">
+              <div className="font-semibold">{toggleTarget.nombre}</div>
+              <div className="text-xs text-slate-500 dark:text-zinc-400">{toggleTarget.correo}</div>
+            </div>
+          )}
+          {toggleError && (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400">
+              {toggleError}
+            </div>
+          )}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="ghost" onClick={closeToggleModal} disabled={toggling}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleToggleConfirm}
+              disabled={toggling}
+              className={toggleTarget?.activo
+                ? "bg-red-600 hover:bg-red-700 text-white"
+                : "bg-emerald-600 hover:bg-emerald-700 text-white"
+              }
+            >
+              {toggling ? t('common.saving') : (toggleTarget?.activo ? t('admin.users.deactivate') : t('admin.users.activate'))}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

@@ -115,6 +115,7 @@ const resources = {
           activate: "Activar",
           deactivate: "Desactivar",
           confirmDesact: "¿Desactivar usuario?",
+          confirmAct: "¿Activar usuario?",
           noData: "No hay usuarios."
         },
         reservations: {
@@ -296,6 +297,7 @@ const resources = {
           activate: "Activate",
           deactivate: "Deactivate",
           confirmDesact: "Deactivate user?",
+          confirmAct: "Activate user?",
           noData: "No users found."
         },
         reservations: {
