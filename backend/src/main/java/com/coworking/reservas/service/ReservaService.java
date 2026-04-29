@@ -355,7 +355,7 @@ public class ReservaService implements IReservaService {
                                                                    String estado, String modo, Long espacioId,
                                                                    int page, int size) {
         actualizarReservasFinalizadas();
-        validarPaginacion(page, size);
+        validarPaginacionReporte(page, size);
 
         String estadoValidado = normalizarEstadoReporte(estado);
         String modoValidado = normalizarModoReporte(modo);
@@ -543,6 +543,16 @@ public class ReservaService implements IReservaService {
 
         if (size < 1 || size > MAX_PAGE_SIZE) {
             throw new IllegalArgumentException("El tamano de pagina debe estar entre 1 y " + MAX_PAGE_SIZE + ".");
+        }
+    }
+
+    private void validarPaginacionReporte(int page, int size) {
+        if (page < 0) {
+            throw new IllegalArgumentException("El numero de pagina no puede ser negativo.");
+        }
+
+        if (size < 1) {
+            throw new IllegalArgumentException("El tamano de pagina debe ser mayor o igual a 1.");
         }
     }
 
