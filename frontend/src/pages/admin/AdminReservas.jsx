@@ -5,7 +5,7 @@ import { Card } from '../../components/ui/Card';
 import { Button, Input, Label } from '../../components/ui/Forms';
 import { Modal } from '../../components/ui/Modal';
 import { format } from '../../utils/dateUtils';
-import { Plus, Edit } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import { cn } from '../../utils/utils';
 
 const RESERVATIONS_PAGE_SIZE = 10;
@@ -29,6 +29,11 @@ const AdminReservas = () => {
     estadoId: '' 
   });
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [availabilityChecking, setAvailabilityChecking] = useState(false);
+  const [availabilityResult, setAvailabilityResult] = useState(null);
+  const [availabilityError, setAvailabilityError] = useState('');
 
   // Reference data for dropdowns (from dedicated admin endpoints)
   const [users, setUsers] = useState([]);     // UsuarioReservaOptionResponse: { id, nombre, correo }
@@ -69,19 +74,26 @@ const AdminReservas = () => {
     loadReservations(0);
   }, []);
 
+  useEffect(() => {
+    setAvailabilityResult(null);
+    setAvailabilityError('');
+  }, [formData.espacioId, formData.fecha, formData.horaInicio, formData.horaFin]);
+
   const openNewForm = () => {
     setIsNew(true);
     // Default to first available option for each dropdown
     const defaultEstado = estados.find(e => e.nombre === 'CONFIRMADA')?.id || estados[0]?.id || '';
     setFormData({ 
       id: null, 
-      usuarioId: users[0]?.id || '', 
-      espacioId: spaces[0]?.id || '', 
+      usuarioId: users[0]?.id ? String(users[0].id) : '', 
+      espacioId: spaces[0]?.id ? String(spaces[0].id) : '', 
       fecha: new Date().toISOString().split('T')[0], 
       horaInicio: '', 
       horaFin: '', 
-      estadoId: defaultEstado
+      estadoId: defaultEstado ? String(defaultEstado) : ''
     });
+    setAvailabilityResult(null);
+    setAvailabilityError('');
     setIsFormOpen(true);
   };
 
@@ -90,13 +102,15 @@ const AdminReservas = () => {
     // ReservaAdminResponse has: id, usuarioId, espacioId, fecha, horaInicio, horaFin, estadoId, estado
     setFormData({ 
       id: reserva.id,
-      usuarioId: reserva.usuarioId, 
-      espacioId: reserva.espacioId, 
+      usuarioId: reserva.usuarioId ? String(reserva.usuarioId) : '', 
+      espacioId: reserva.espacioId ? String(reserva.espacioId) : '', 
       fecha: reserva.fecha, 
       horaInicio: reserva.horaInicio?.slice(0,5) || '', 
       horaFin: reserva.horaFin?.slice(0,5) || '',
-      estadoId: reserva.estadoId
+      estadoId: reserva.estadoId ? String(reserva.estadoId) : ''
     });
+    setAvailabilityResult(null);
+    setAvailabilityError('');
     setIsFormOpen(true);
   };
 
@@ -126,6 +140,57 @@ const AdminReservas = () => {
       alert(err.message || 'Error al guardar reserva');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const openDeleteModal = (reserva) => {
+    setDeleteTarget(reserva);
+  };
+
+  const closeDeleteModal = () => {
+    if (deletingId) return;
+    setDeleteTarget(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    try {
+      setDeletingId(deleteTarget.id);
+      await fetchApi(`/api/admin/reservas/${deleteTarget.id}`, { method: 'DELETE' });
+      setDeleteTarget(null);
+      loadReservations(data.pageNumber);
+    } catch (err) {
+      alert(err.message || 'Error al eliminar la reserva');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleCheckAvailability = async () => {
+    if (!formData.espacioId) {
+      setAvailabilityError('Selecciona un espacio para verificar disponibilidad.');
+      return;
+    }
+
+    if (!formData.fecha) {
+      setAvailabilityError('Selecciona una fecha para verificar disponibilidad.');
+      return;
+    }
+
+    try {
+      setAvailabilityChecking(true);
+      setAvailabilityError('');
+      const params = new URLSearchParams({ fecha: formData.fecha });
+      if (formData.horaInicio && formData.horaFin) {
+        params.set('horaInicio', formData.horaInicio);
+        params.set('horaFin', formData.horaFin);
+      }
+      const data = await fetchApi(`/api/espacios/${formData.espacioId}/disponibilidad?${params.toString()}`);
+      setAvailabilityResult(data);
+    } catch (err) {
+      setAvailabilityError(err.message || 'No fue posible verificar disponibilidad.');
+    } finally {
+      setAvailabilityChecking(false);
     }
   };
 
@@ -184,9 +249,20 @@ const AdminReservas = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <Button variant="ghost" className="h-8 w-8 p-0" title={t('common.edit')} onClick={() => openEditForm(res)}>
-                        <Edit className="h-4 w-4" />
-                       </Button>
+                       <div className="flex items-center justify-end gap-2">
+                         <Button variant="ghost" className="h-8 w-8 p-0" title={t('common.edit')} onClick={() => openEditForm(res)}>
+                           <Edit className="h-4 w-4" />
+                         </Button>
+                         <Button
+                           variant="ghost"
+                           className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+                           title="Eliminar"
+                           onClick={() => openDeleteModal(res)}
+                           disabled={deletingId === res.id}
+                         >
+                           <Trash2 className="h-4 w-4" />
+                         </Button>
+                       </div>
                     </td>
                   </tr>
                 ))}
@@ -223,7 +299,7 @@ const AdminReservas = () => {
                 id="usuarioId" 
                 className={selectClasses}
                 value={formData.usuarioId}
-                onChange={e => setFormData({...formData, usuarioId: e.target.value})}
+                onChange={e => setFormData(prev => ({...prev, usuarioId: e.target.value}))}
                 required
               >
                 <option value="" disabled className="dark:bg-zinc-900">Seleccionar...</option>
@@ -238,7 +314,7 @@ const AdminReservas = () => {
               id="espacioId" 
               className={selectClasses}
               value={formData.espacioId}
-              onChange={e => setFormData({...formData, espacioId: e.target.value})}
+              onChange={e => setFormData(prev => ({...prev, espacioId: e.target.value}))}
               required
             >
               <option value="" disabled className="dark:bg-zinc-900">Seleccionar...</option>
@@ -257,7 +333,7 @@ const AdminReservas = () => {
                 id="estado" 
                 className={selectClasses}
                 value={formData.estadoId}
-                onChange={e => setFormData({...formData, estadoId: e.target.value})}
+                onChange={e => setFormData(prev => ({...prev, estadoId: e.target.value}))}
                 required
               >
                 <option value="" disabled className="dark:bg-zinc-900">Seleccionar...</option>
@@ -269,19 +345,85 @@ const AdminReservas = () => {
           <div className="flex gap-4">
             <div className="space-y-2 flex-1">
               <Label htmlFor="horaInicio">{t('admin.reservations.startTimeLabel')}</Label>
-              <Input id="horaInicio" type="time" value={formData.horaInicio} onChange={e => setFormData({...formData, horaInicio: e.target.value})} required />
+              <Input id="horaInicio" type="time" value={formData.horaInicio} onChange={e => setFormData(prev => ({...prev, horaInicio: e.target.value}))} required />
             </div>
             <div className="space-y-2 flex-1">
               <Label htmlFor="horaFin">{t('admin.reservations.endTimeLabel')}</Label>
-              <Input id="horaFin" type="time" value={formData.horaFin} onChange={e => setFormData({...formData, horaFin: e.target.value})} required />
+              <Input id="horaFin" type="time" value={formData.horaFin} onChange={e => setFormData(prev => ({...prev, horaFin: e.target.value}))} required />
             </div>
           </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <Button type="button" variant="outline" onClick={handleCheckAvailability} disabled={availabilityChecking}>
+              {availabilityChecking ? 'Verificando...' : 'Verificar disponibilidad'}
+            </Button>
+            {availabilityResult?.mensajeDisponibilidad && (
+              <span className={cn(
+                "text-xs font-medium",
+                availabilityResult.rangoConsultadoDisponible ? "text-emerald-500" : "text-red-500"
+              )}>
+                {availabilityResult.mensajeDisponibilidad}
+              </span>
+            )}
+          </div>
+
+          {availabilityError && (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400">
+              {availabilityError}
+            </div>
+          )}
+
+          {availabilityResult && (
+            <div className={cn(
+              "rounded-md border px-3 py-2 text-xs",
+              availabilityResult.rangoConsultadoDisponible
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400"
+                : "border-red-200 bg-red-50 text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400"
+            )}>
+              {availabilityResult.rangoConsultadoDisponible
+                ? 'El horario seleccionado esta disponible.'
+                : 'El horario seleccionado tiene conflicto.'}
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-slate-200 dark:border-zinc-800">
             <Button type="button" variant="ghost" onClick={() => setIsFormOpen(false)} disabled={saving}>{t('common.cancel')}</Button>
             <Button type="submit" disabled={saving}>{saving ? t('common.saving') : t('common.save')}</Button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!deleteTarget}
+        onClose={closeDeleteModal}
+        title="Eliminar reserva"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 dark:text-zinc-400">
+            Seguro que deseas eliminar esta reserva? Esta accion no se puede deshacer.
+          </p>
+          {deleteTarget && (
+            <div className="rounded-lg border border-slate-200 p-3 text-sm text-slate-700 dark:border-zinc-800 dark:text-zinc-300">
+              <div className="font-semibold">{deleteTarget.nombreEspacio}</div>
+              <div className="text-xs text-slate-500 dark:text-zinc-400">
+                {deleteTarget.usuarioNombre} · {format(deleteTarget.fecha)} · {deleteTarget.horaInicio?.slice(0,5)} - {deleteTarget.horaFin?.slice(0,5)}
+              </div>
+            </div>
+          )}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="ghost" onClick={closeDeleteModal} disabled={!!deletingId}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleDeleteConfirm}
+              disabled={!!deletingId}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deletingId ? t('common.saving') : 'Eliminar'}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
